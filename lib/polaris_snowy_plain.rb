@@ -1,3 +1,10 @@
+#-------------------------------------------------------------------------------
+# Déplacement à l'extérieur de la base
+#-------------------------------------------------------------------------------
+# Lancer snowy_plain_initialize dans un évènement en démarrage automatique à l'arrivée de la map, et supprimer cet évènement
+# Lancer snowy_plain_key_entered dans un évènement en processus parallèle, après que l'évènement d'avant est passé
+# Tester snowy_plain_base_found? dans une condition pour vérifier si le joueur est bien juste en face de la base
+
 class Interpreter
   DEFAULT_OUTER_CIRCLE_RADIUS = 100
   DEFAULT_INNER_CIRCLE_RADIUS = 70
@@ -6,11 +13,11 @@ class Interpreter
   MIN_DISTANCE_FROM_BASE = 5  # Distance minimale entre le héros et la base
   MOVE_STEP = 2               # Distance de déplacement
   
-  # $outer_circle_radius       Rayon du cercle extérieur, au delà duquel le héros ne peut aller
-  # $inner_circle_radius       Rayon du cercle intérieur, à partir duquel la base est visible
-  # $hero_position_angle       Angle du héros par rapport au cercle trigo
-  # $hero_distance_from_base   Distance du héros par rapport à la base
-  # $hero_sight_angle          Angle où le héros regarde par rapport à la droite qui va de la base à lui     
+  # $outer_circle_radius        Rayon du cercle extérieur, au delà duquel le héros ne peut aller
+  # $inner_circle_radius        Rayon du cercle intérieur, à partir duquel la base est visible
+  # $hero_position_angle        Angle du héros par rapport au cercle trigo
+  # $hero_distance_from_base    Distance du héros par rapport à la base
+  # $hero_sight_angle           Angle où le héros regarde par rapport à la droite qui va de la base à lui     
 
   def snowy_plain_initialize(options = {})
     $outer_circle_radius = options[:outer_circle_radius] || DEFAULT_OUTER_CIRCLE_RADIUS
@@ -20,27 +27,18 @@ class Interpreter
     $hero_sight_angle = options[:hero_sight_angle] || DEFAULT_ANGLE
   end
   
-  def snowy_plain_move_forward
-    snowy_plain_move_to_direction $hero_sight_angle unless player_touches_base?
-  end
-  
-  def snowy_plain_move_backwards
-    snowy_plain_move_to_direction(-$hero_sight_angle) unless player_touches_outer_limit?
-  end
-  
-  def snowy_plain_move_to_direction(angle)
-    player_new_polar_coordinates(angle)
-    resolve_limits
-  end
-  
-  def snowy_plain_turn_left
-    $hero_sight_angle -= 1
-    $hero_sight_angle %= 360
-  end
-  
-  def snowy_plain_turn_right
-    $hero_sight_angle += 1
-    $hero_sight_angle %= 360
+  def snowy_plain_key_entered
+    case Input.dir4
+      when Input::UP
+        move_forward
+      when Input::DOWN
+        move_backwards
+      when Input::LEFT
+        turn_left
+      when Input::RIGHT
+        turn_right
+    end
+    snowy_plain_information if Input.press? Input::A
   end
 
   def snowy_plain_base_found?
@@ -52,6 +50,29 @@ class Interpreter
   end
 
   private
+  
+  def move_forward
+    move_to_direction $hero_sight_angle unless player_touches_base?
+  end
+  
+  def move_backwards
+    move_to_direction(-$hero_sight_angle) unless player_touches_outer_limit?
+  end
+  
+  def turn_left
+    $hero_sight_angle -= 1
+    $hero_sight_angle %= 360
+  end
+  
+  def turn_right
+    $hero_sight_angle += 1
+    $hero_sight_angle %= 360
+  end
+  
+  def move_to_direction(angle)
+    player_new_polar_coordinates(angle)
+    resolve_limits
+  end
 
   def player_touches_base?
     $hero_distance_from_base == MIN_DISTANCE_FROM_BASE
