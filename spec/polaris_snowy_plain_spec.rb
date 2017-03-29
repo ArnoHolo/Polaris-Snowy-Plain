@@ -3,6 +3,7 @@ require 'polaris_snowy_plain.rb'
 
 RSpec.describe SnowyPlain do
   let(:snowy_plain) { SnowyPlain.new options }
+  before { $snowy_plain_hero = IntroPlain::Hero.new }
   let(:options) { {} }
 
   describe 'initialize_variables' do
@@ -10,21 +11,19 @@ RSpec.describe SnowyPlain do
       it 'initializes all variables with default values' do
         expect(snowy_plain.outer_circle_radius).to eq SnowyPlain::DEFAULT_OUTER_CIRCLE_RADIUS
         expect(snowy_plain.inner_circle_radius).to eq SnowyPlain::DEFAULT_INNER_CIRCLE_RADIUS
-        expect(snowy_plain.hero_position_angle).to eq SnowyPlain::DEFAULT_ANGLE
+        expect(snowy_plain.hero_position_angle).to eq IntroPlain::Hero::DEFAULT_ANGLE
         expect(snowy_plain.hero_distance_from_base).to eq SnowyPlain::DEFAULT_OUTER_CIRCLE_RADIUS
-        expect(snowy_plain.hero_sight_angle).to eq SnowyPlain::DEFAULT_ANGLE
       end
     end
 
     context 'when options are given' do
-      let(:options) { {:outer_circle_radius => 1, :inner_circle_radius => 2, :hero_position_angle => 3, :hero_distance_from_base => 4, :hero_sight_angle => 5} }
+      let(:options) { {:outer_circle_radius => 1, :inner_circle_radius => 2, :hero_position_angle => 3, :hero_distance_from_base => 4} }
 
       it 'initializes all variables with these options' do
         expect(snowy_plain.outer_circle_radius).to eq 1
         expect(snowy_plain.inner_circle_radius).to eq 2
         expect(snowy_plain.hero_position_angle).to eq 3
         expect(snowy_plain.hero_distance_from_base).to eq 4
-        expect(snowy_plain.hero_sight_angle).to eq 5
       end
     end
   end
@@ -36,19 +35,19 @@ RSpec.describe SnowyPlain do
       before { snowy_plain.hero_distance_from_base = SnowyPlain::MIN_DISTANCE_FROM_BASE }
       
       context 'when hero looks at the base' do
-        before { snowy_plain.hero_sight_angle = SnowyPlain::MAX_SIGHT_ANGLE - 1 }
+        before { $snowy_plain_hero.sight_angle = SnowyPlain::MAX_SIGHT_ANGLE - 1 }
 
         it { should eq true }
       end
       
       context 'when hero looks at the base from the left' do
-        before { snowy_plain.hero_sight_angle = 355 }
+        before { $snowy_plain_hero.sight_angle = 355 }
 
         it { should eq true }
       end
 
       context 'when hero does not look at the base' do
-        before { snowy_plain.hero_sight_angle = SnowyPlain::MAX_SIGHT_ANGLE + 1 }
+        before { $snowy_plain_hero.sight_angle = SnowyPlain::MAX_SIGHT_ANGLE + 1 }
 
         it { should eq false }
       end
@@ -63,7 +62,7 @@ RSpec.describe SnowyPlain do
 
   describe 'base_x_position' do
     context 'when hero looks a bit on the left' do
-      before { snowy_plain.hero_sight_angle = 360 - SnowyPlain::WIDE_SIGHT_ANGLE / 2 }
+      before { $snowy_plain_hero.sight_angle = 360 - SnowyPlain::WIDE_SIGHT_ANGLE / 2 }
 
       subject { snowy_plain.send(:base_x_position) }
 
@@ -71,7 +70,7 @@ RSpec.describe SnowyPlain do
     end
 
     context 'when hero looks at the left limit' do
-      before { snowy_plain.hero_sight_angle = 360 - SnowyPlain::WIDE_SIGHT_ANGLE + 1 }
+      before { $snowy_plain_hero.sight_angle = 360 - SnowyPlain::WIDE_SIGHT_ANGLE + 1 }
 
       subject { snowy_plain.send(:base_x_position) }
 
@@ -79,7 +78,7 @@ RSpec.describe SnowyPlain do
     end
 
     context 'when hero looks a bit on the right' do
-      before { snowy_plain.hero_sight_angle = SnowyPlain::WIDE_SIGHT_ANGLE / 2 }
+      before { $snowy_plain_hero.sight_angle = SnowyPlain::WIDE_SIGHT_ANGLE / 2 }
 
       subject { snowy_plain.send(:base_x_position) }
 
@@ -87,7 +86,7 @@ RSpec.describe SnowyPlain do
     end
 
     context 'when hero looks at the right limit' do
-      before { snowy_plain.hero_sight_angle = SnowyPlain::WIDE_SIGHT_ANGLE - 1 }
+      before { $snowy_plain_hero.sight_angle = SnowyPlain::WIDE_SIGHT_ANGLE - 1 }
 
       subject { snowy_plain.send(:base_x_position) }
 
@@ -101,7 +100,7 @@ RSpec.describe SnowyPlain do
     before do
       snowy_plain.hero_position_angle = 0
       snowy_plain.hero_distance_from_base = hero_distance_from_base
-      snowy_plain.hero_sight_angle = hero_sight_angle
+      $snowy_plain_hero.sight_angle = hero_sight_angle
     end
 
     subject { snowy_plain.send(:move_to_direction, hero_sight_angle) }
@@ -115,7 +114,7 @@ RSpec.describe SnowyPlain do
         it 'changes hero angle and position' do
           expect(snowy_plain.hero_position_angle).to be > 0
           expect(snowy_plain.hero_distance_from_base).to be < hero_distance_from_base
-          expect(snowy_plain.hero_sight_angle).to eq hero_sight_angle
+          expect($snowy_plain_hero.sight_angle).to eq hero_sight_angle
         end
       end
 
@@ -127,7 +126,7 @@ RSpec.describe SnowyPlain do
         it 'changes hero angle and position' do
           expect(snowy_plain.hero_position_angle).to be > 0
           expect(snowy_plain.hero_distance_from_base).to eq hero_distance_from_base
-          expect(snowy_plain.hero_sight_angle).to eq hero_sight_angle
+          expect($snowy_plain_hero.sight_angle).to eq hero_sight_angle
         end
       end
     end
@@ -141,7 +140,7 @@ RSpec.describe SnowyPlain do
         it 'changes hero angle and position' do
           expect(snowy_plain.hero_position_angle).to be > 0
           expect(snowy_plain.hero_distance_from_base).to be > hero_distance_from_base
-          expect(snowy_plain.hero_sight_angle).to eq hero_sight_angle
+          expect($snowy_plain_hero.sight_angle).to eq hero_sight_angle
         end
       end
 
@@ -153,7 +152,7 @@ RSpec.describe SnowyPlain do
         it 'changes hero angle and position' do
           expect(snowy_plain.hero_position_angle).to be > 0
           expect(snowy_plain.hero_distance_from_base).to eq hero_distance_from_base
-          expect(snowy_plain.hero_sight_angle).to eq hero_sight_angle
+          expect($snowy_plain_hero.sight_angle).to eq hero_sight_angle
         end
       end
     end
@@ -166,7 +165,7 @@ RSpec.describe SnowyPlain do
       it 'changes hero angle and position' do
         expect(snowy_plain.hero_position_angle).to be < 0
         expect(snowy_plain.hero_distance_from_base).to be > hero_distance_from_base
-        expect(snowy_plain.hero_sight_angle).to eq hero_sight_angle
+        expect($snowy_plain_hero.sight_angle).to eq hero_sight_angle
       end
     end
 
@@ -178,7 +177,7 @@ RSpec.describe SnowyPlain do
       it 'changes hero angle and position' do
         expect(snowy_plain.hero_position_angle).to be < 0
         expect(snowy_plain.hero_distance_from_base).to be < hero_distance_from_base
-        expect(snowy_plain.hero_sight_angle).to eq hero_sight_angle
+        expect($snowy_plain_hero.sight_angle).to eq hero_sight_angle
       end
     end
   end

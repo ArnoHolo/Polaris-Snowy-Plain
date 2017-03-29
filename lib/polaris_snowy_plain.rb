@@ -7,9 +7,9 @@
 
 class Interpreter
   def snowy_plain_initialize(options = {})
+    $snowy_plain_hero = IntroPlain::Hero.new(options)
     $snowy_plain = SnowyPlain.new(options)
     $snowy_plain_player_actions = IntroPlain::PlayerActions.new
-    $snowy_plain_hero = IntroPlain::Hero.new
   end
   
   def snowy_plain_key_entered
@@ -40,22 +40,30 @@ module IntroPlain
   end
 
   class Hero
+    DEFAULT_ANGLE = 0
+
+    attr_accessor :sight_angle      # Angle où le héros regarde par rapport à la droite qui va de la base à lui   
+
+    def initialize(options = {})
+      @sight_angle = options[:sight_angle] || DEFAULT_ANGLE
+    end 
+    
     def move_forward
-      $snowy_plain.move_to_direction $snowy_plain.hero_sight_angle unless $snowy_plain.hero_touches_base?
+      $snowy_plain.move_to_direction @sight_angle unless $snowy_plain.hero_touches_base?
     end
   
     def move_backwards
-      $snowy_plain.move_to_direction(-$snowy_plain.hero_sight_angle) unless $snowy_plain.hero_touches_outer_limit?
+      $snowy_plain.move_to_direction(-@sight_angle) unless $snowy_plain.hero_touches_outer_limit?
     end
   
     def turn_left
-      $snowy_plain.hero_sight_angle -= 1
-      $snowy_plain.hero_sight_angle %= 360
+      @sight_angle -= 1
+      @sight_angle %= 360
     end
   
     def turn_right
-      $snowy_plain.hero_sight_angle += 1
-      $snowy_plain.hero_sight_angle %= 360
+      @sight_angle += 1
+      @sight_angle %= 360
     end
   end
 end
@@ -63,7 +71,6 @@ end
 class SnowyPlain
   DEFAULT_OUTER_CIRCLE_RADIUS = 100
   DEFAULT_INNER_CIRCLE_RADIUS = 70
-  DEFAULT_ANGLE = 0
   MAX_SIGHT_ANGLE = 10        # Angle où le héros peut entrer dans la base quand il est devant
   WIDE_SIGHT_ANGLE = 30       # Angle maximal où le héros peut voir la base
   MIN_DISTANCE_FROM_BASE = 5  # Distance minimale entre le héros et la base
@@ -73,19 +80,17 @@ class SnowyPlain
   attr_accessor :outer_circle_radius        # Rayon du cercle extérieur, au delà duquel le héros ne peut aller
   attr_accessor :inner_circle_radius        # Rayon du cercle intérieur, à partir duquel la base est visible
   attr_accessor :hero_position_angle        # Angle du héros par rapport au cercle trigo
-  attr_accessor :hero_distance_from_base    # Distance du héros par rapport à la base
-  attr_accessor :hero_sight_angle           # Angle où le héros regarde par rapport à la droite qui va de la base à lui     
+  attr_accessor :hero_distance_from_base    # Distance du héros par rapport à la base 
 
   def initialize(options = {})
     @outer_circle_radius = options[:outer_circle_radius] || DEFAULT_OUTER_CIRCLE_RADIUS
     @inner_circle_radius = options[:inner_circle_radius] || DEFAULT_INNER_CIRCLE_RADIUS
-    @hero_position_angle = options[:hero_position_angle] || DEFAULT_ANGLE
+    @hero_position_angle = options[:hero_position_angle] || IntroPlain::Hero::DEFAULT_ANGLE
     @hero_distance_from_base = options[:hero_distance_from_base] || @outer_circle_radius
-    @hero_sight_angle = options[:hero_sight_angle] || DEFAULT_ANGLE
   end
   
   def information
-    print "#{@hero_sight_angle} - #{@hero_distance_from_base}"
+    print "#{$snowy_plain_hero.sight_angle} - #{@hero_distance_from_base}"
   end
 
   def base_found?
@@ -116,7 +121,7 @@ class SnowyPlain
   private
 
   def hero_can_see_base?
-    @hero_sight_angle <= WIDE_SIGHT_ANGLE || @hero_sight_angle >= 360 - WIDE_SIGHT_ANGLE
+    $snowy_plain_hero.sight_angle <= WIDE_SIGHT_ANGLE || $snowy_plain_hero.sight_angle >= 360 - WIDE_SIGHT_ANGLE
   end
 
   def base_zoom
@@ -127,7 +132,7 @@ class SnowyPlain
   end
 
   def base_x_position
-    base_position_cosinus = Math.cos(-convert_to_radians(@hero_sight_angle + 90))
+    base_position_cosinus = Math.cos(-convert_to_radians($snowy_plain_hero.sight_angle + 90))
     max_width_cosinus = Math.cos(convert_to_radians(90 - WIDE_SIGHT_ANGLE))
     base_position_scaled = base_position_cosinus * 320 / max_width_cosinus
     base_position_scaled + 320
@@ -148,7 +153,7 @@ class SnowyPlain
   end
 
   def hero_looks_at_base?
-    @hero_sight_angle <= MAX_SIGHT_ANGLE || @hero_sight_angle >= 360 - MAX_SIGHT_ANGLE
+    $snowy_plain_hero.sight_angle <= MAX_SIGHT_ANGLE || $snowy_plain_hero.sight_angle >= 360 - MAX_SIGHT_ANGLE
   end
 
   def convert_to_radians(degrees)
