@@ -9,6 +9,7 @@ class Interpreter
   def snowy_plain_initialize(options = {})
     $snowy_plain = SnowyPlain.new(options)
     $snowy_plain_player_actions = IntroPlain::PlayerActions.new
+    $snowy_plain_hero = IntroPlain::Hero.new
   end
   
   def snowy_plain_key_entered
@@ -25,16 +26,36 @@ module IntroPlain
     def key_entered
       case Input.dir4
         when Input::UP
-          $snowy_plain.move_forward
+          $snowy_plain_hero.move_forward
         when Input::DOWN
-          $snowy_plain.move_backwards
+          $snowy_plain_hero.move_backwards
         when Input::LEFT
-          $snowy_plain.turn_left
+          $snowy_plain_hero.turn_left
         when Input::RIGHT
-          $snowy_plain.turn_right
+          $snowy_plain_hero.turn_right
       end
       $snowy_plain.display_base
       $snowy_plain.information if Input.press? Input::A
+    end
+  end
+
+  class Hero
+    def move_forward
+      $snowy_plain.move_to_direction $snowy_plain.hero_sight_angle unless $snowy_plain.hero_touches_base?
+    end
+  
+    def move_backwards
+      $snowy_plain.move_to_direction(-$snowy_plain.hero_sight_angle) unless $snowy_plain.hero_touches_outer_limit?
+    end
+  
+    def turn_left
+      $snowy_plain.hero_sight_angle -= 1
+      $snowy_plain.hero_sight_angle %= 360
+    end
+  
+    def turn_right
+      $snowy_plain.hero_sight_angle += 1
+      $snowy_plain.hero_sight_angle %= 360
     end
   end
 end
@@ -63,24 +84,6 @@ class SnowyPlain
     @hero_sight_angle = options[:hero_sight_angle] || DEFAULT_ANGLE
   end
   
-  def move_forward
-    move_to_direction @hero_sight_angle unless hero_touches_base?
-  end
-  
-  def move_backwards
-    move_to_direction(-@hero_sight_angle) unless hero_touches_outer_limit?
-  end
-  
-  def turn_left
-    @hero_sight_angle -= 1
-    @hero_sight_angle %= 360
-  end
-  
-  def turn_right
-    @hero_sight_angle += 1
-    @hero_sight_angle %= 360
-  end
-  
   def information
     print "#{@hero_sight_angle} - #{@hero_distance_from_base}"
   end
@@ -95,6 +98,19 @@ class SnowyPlain
     else
       hide_base
     end
+  end
+
+  def hero_touches_base?
+    @hero_distance_from_base == MIN_DISTANCE_FROM_BASE
+  end
+  
+  def move_to_direction(angle)
+    hero_new_polar_coordinates(angle)
+    resolve_limits
+  end
+
+  def hero_touches_outer_limit?
+    @hero_distance_from_base == @outer_circle_radius
   end
 
   private
@@ -129,19 +145,6 @@ class SnowyPlain
   
   def hide_base
     move_base(:opacity => 0)
-  end
-  
-  def move_to_direction(angle)
-    hero_new_polar_coordinates(angle)
-    resolve_limits
-  end
-
-  def hero_touches_base?
-    @hero_distance_from_base == MIN_DISTANCE_FROM_BASE
-  end
-
-  def hero_touches_outer_limit?
-    @hero_distance_from_base == @outer_circle_radius
   end
 
   def hero_looks_at_base?

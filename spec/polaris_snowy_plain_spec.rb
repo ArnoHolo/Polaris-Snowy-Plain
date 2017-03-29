@@ -95,50 +95,6 @@ RSpec.describe SnowyPlain do
     end
   end
 
-  describe 'move_forward' do
-    context 'when hero has not reached the base yet' do
-      before { expect(snowy_plain).to receive(:hero_touches_base?).and_return(false) }
-
-      context 'when hero sight angle is equal zero' do
-        before { expect(snowy_plain).to receive(:move_to_direction).with(snowy_plain.hero_sight_angle) }
-
-        it { snowy_plain.send(:move_forward) }
-      end
-    end
-
-    context 'when hero has reached the base' do
-      before { expect(snowy_plain).to receive(:hero_touches_base?).and_return(true) }
-
-      context 'when hero sight angle is equal zero' do
-        before { expect(snowy_plain).not_to receive(:move_to_direction) }
-
-        it { snowy_plain.send(:move_forward) }
-      end
-    end
-  end
-
-  describe 'move_backwards' do
-    context 'when hero has not reached the limit yet' do
-      before { expect(snowy_plain).to receive(:hero_touches_outer_limit?).and_return(false) }
-
-      context 'when hero sight angle is equal zero' do
-        before { expect(snowy_plain).to receive(:move_to_direction).with(-snowy_plain.hero_sight_angle) }
-
-        it { snowy_plain.send(:move_backwards) }
-      end
-    end
-
-    context 'when hero has reached the limit' do
-      before { expect(snowy_plain).to receive(:hero_touches_outer_limit?).and_return(true) }
-
-      context 'when hero sight angle is equal zero' do
-        before { expect(snowy_plain).not_to receive(:move_to_direction) }
-
-        it { snowy_plain.send(:move_backwards) }
-      end
-    end
-  end
-
   describe 'move_to_direction' do
     let(:hero_distance_from_base) { 50 }
 
@@ -223,45 +179,6 @@ RSpec.describe SnowyPlain do
         expect(snowy_plain.hero_position_angle).to be < 0
         expect(snowy_plain.hero_distance_from_base).to be < hero_distance_from_base
         expect(snowy_plain.hero_sight_angle).to eq hero_sight_angle
-      end
-    end
-  end
-
-  describe 'turn_left' do
-    context 'when angle is more than zero' do
-      before { snowy_plain.hero_sight_angle = 90 }
-      before { snowy_plain.send(:turn_left) }
-
-      it 'decreases hero sight angle' do
-        expect(snowy_plain.hero_sight_angle).to eq 89
-      end
-    end
-
-    context 'when angle equals zero' do
-      before { snowy_plain.send(:turn_left) }
-
-      it 'sets hero sight angle to 359' do
-        expect(snowy_plain.hero_sight_angle).to eq 359
-      end
-    end
-  end
-
-  describe 'turn_right' do
-    context 'when angle is less than 359' do
-      before { snowy_plain.hero_sight_angle = 170 }
-      before { snowy_plain.send(:turn_right) }
-
-      it 'increases hero sight angle' do
-        expect(snowy_plain.hero_sight_angle).to eq 171
-      end
-    end
-
-    context 'when angle equals 359' do
-      before { snowy_plain.hero_sight_angle = 359 }
-      before { snowy_plain.send(:turn_right) }
-
-      it 'sets hero sight angle to 0' do
-        expect(snowy_plain.hero_sight_angle).to eq 0
       end
     end
   end

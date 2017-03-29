@@ -4,6 +4,7 @@ require 'polaris_snowy_plain.rb'
 RSpec.describe IntroPlain::PlayerActions do
   let(:player_actions) { IntroPlain::PlayerActions.new }
   before { $snowy_plain = SnowyPlain.new }
+  before { $snowy_plain_hero = IntroPlain::Hero.new }
 
   describe 'key_entered' do
     before do
@@ -23,7 +24,7 @@ RSpec.describe IntroPlain::PlayerActions do
     context 'when player enters UP key' do
       before { expect(Input).to receive(:dir4).and_return(:input_up) }
 
-      before { expect($snowy_plain).to receive(:move_forward) }
+      before { expect($snowy_plain_hero).to receive(:move_forward) }
       before { expect($snowy_plain).not_to receive(:information) }
 
       it { player_actions.key_entered }
@@ -32,7 +33,7 @@ RSpec.describe IntroPlain::PlayerActions do
     context 'when player enters DOWN key' do
       before { expect(Input).to receive(:dir4).and_return(:input_down) }
 
-      before { expect($snowy_plain).to receive(:move_backwards) }
+      before { expect($snowy_plain_hero).to receive(:move_backwards) }
       before { expect($snowy_plain).not_to receive(:information) }
 
       it { player_actions.key_entered }
@@ -41,7 +42,7 @@ RSpec.describe IntroPlain::PlayerActions do
     context 'when player enters LEFT key' do
       before { expect(Input).to receive(:dir4).and_return(:input_left) }
 
-      before { expect($snowy_plain).to receive(:turn_left) }
+      before { expect($snowy_plain_hero).to receive(:turn_left) }
       before { expect($snowy_plain).not_to receive(:information) }
 
       it { player_actions.key_entered }
@@ -50,7 +51,7 @@ RSpec.describe IntroPlain::PlayerActions do
     context 'when player enters RIGHT key' do
       before { expect(Input).to receive(:dir4).and_return(:input_right) }
 
-      before { expect($snowy_plain).to receive(:turn_right) }
+      before { expect($snowy_plain_hero).to receive(:turn_right) }
       before { expect($snowy_plain).not_to receive(:information) }
 
       it { player_actions.key_entered }
