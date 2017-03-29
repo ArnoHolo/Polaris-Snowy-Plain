@@ -69,6 +69,7 @@ RSpec.describe SnowyPlain do
 
       it { should be > 320 }
     end
+
     context 'when hero looks at the left limit' do
       before { snowy_plain.hero_sight_angle = 360 - SnowyPlain::WIDE_SIGHT_ANGLE + 1 }
 

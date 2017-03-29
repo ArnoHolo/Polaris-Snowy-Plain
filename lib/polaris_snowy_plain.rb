@@ -8,6 +8,7 @@
 class Interpreter
   def snowy_plain_initialize(options = {})
     $snowy_plain = SnowyPlain.new(options)
+    $snowy_plain_player_actions = IntroPlain::PlayerActions.new
   end
   
   def snowy_plain_key_entered
@@ -16,6 +17,25 @@ class Interpreter
 
   def snowy_plain_base_found?
     $snowy_plain.base_found?
+  end
+end
+
+module IntroPlain
+  class PlayerActions
+    def key_entered
+      case Input.dir4
+        when Input::UP
+          $snowy_plain.move_forward
+        when Input::DOWN
+          $snowy_plain.move_backwards
+        when Input::LEFT
+          $snowy_plain.turn_left
+        when Input::RIGHT
+          $snowy_plain.turn_right
+      end
+      $snowy_plain.display_base
+      $snowy_plain.information if Input.press? Input::A
+    end
   end
 end
 
@@ -43,29 +63,30 @@ class SnowyPlain
     @hero_sight_angle = options[:hero_sight_angle] || DEFAULT_ANGLE
   end
   
-  def key_entered
-    case Input.dir4
-      when Input::UP
-        move_forward
-      when Input::DOWN
-        move_backwards
-      when Input::LEFT
-        turn_left
-      when Input::RIGHT
-        turn_right
-    end
-    display_base
-    information if Input.press? Input::A
+  def move_forward
+    move_to_direction @hero_sight_angle unless hero_touches_base?
+  end
+  
+  def move_backwards
+    move_to_direction(-@hero_sight_angle) unless hero_touches_outer_limit?
+  end
+  
+  def turn_left
+    @hero_sight_angle -= 1
+    @hero_sight_angle %= 360
+  end
+  
+  def turn_right
+    @hero_sight_angle += 1
+    @hero_sight_angle %= 360
+  end
+  
+  def information
+    print "#{@hero_sight_angle} - #{@hero_distance_from_base}"
   end
 
   def base_found?
     hero_touches_base? && hero_looks_at_base?
-  end
-
-  private
-
-  def hero_can_see_base?
-    @hero_sight_angle <= WIDE_SIGHT_ANGLE || @hero_sight_angle >= 360 - WIDE_SIGHT_ANGLE
   end
 
   def display_base
@@ -74,6 +95,12 @@ class SnowyPlain
     else
       hide_base
     end
+  end
+
+  private
+
+  def hero_can_see_base?
+    @hero_sight_angle <= WIDE_SIGHT_ANGLE || @hero_sight_angle >= 360 - WIDE_SIGHT_ANGLE
   end
 
   def base_zoom
@@ -102,28 +129,6 @@ class SnowyPlain
   
   def hide_base
     move_base(:opacity => 0)
-  end
-  
-  def move_forward
-    move_to_direction @hero_sight_angle unless hero_touches_base?
-  end
-  
-  def move_backwards
-    move_to_direction(-@hero_sight_angle) unless hero_touches_outer_limit?
-  end
-  
-  def turn_left
-    @hero_sight_angle -= 1
-    @hero_sight_angle %= 360
-  end
-  
-  def turn_right
-    @hero_sight_angle += 1
-    @hero_sight_angle %= 360
-  end
-  
-  def information
-    print "#{@hero_sight_angle} - #{@hero_distance_from_base}"
   end
   
   def move_to_direction(angle)
