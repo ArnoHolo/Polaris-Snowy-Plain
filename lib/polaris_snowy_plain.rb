@@ -14,7 +14,7 @@ class Interpreter
   end
   
   def snowy_plain_key_entered
-    $snowy_plain.key_entered
+    $snowy_plain_player_actions.key_entered
   end
 
   def snowy_plain_base_found?
