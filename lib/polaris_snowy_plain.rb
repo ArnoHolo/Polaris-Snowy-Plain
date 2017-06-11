@@ -107,7 +107,8 @@ class SnowyPlain
 
   def display_base
     opacity = base_is_behind_hero? ? 0 : 255
-    move_base(:image_x => base_x_position, :zoom => base_zoom, :opacity => opacity)
+    zoom = base_zoom
+    move_base(:image_x => base_x_position, :image_y => base_y_position(zoom), :zoom => zoom, :opacity => opacity)
   end
 
   def hero_touches_base?
@@ -142,11 +143,18 @@ class SnowyPlain
     base_position_scaled = base_position_cosinus * 320 / max_width_cosinus
     base_position_scaled + 320
   end
+
+  def base_y_position(zoom)
+    base_ymax = 240
+    base_ymin = 300
+    base_ymax * zoom / 100.0 + base_ymin * (100 - zoom) / 100.0
+  end
   
   def move_base(options = {})
     duration = 1; origin = 1; image_x = 320; image_y = 240; zoom_x = 100; zoom_y = 100; opacity = 255; blend_type = 0;
 
     image_x = options[:image_x] if options[:image_x]
+    image_y = options[:image_y] if options[:image_y]
     zoom_x = zoom_y = options[:zoom] if options[:zoom]
     opacity = options[:opacity] if options[:opacity]
 
