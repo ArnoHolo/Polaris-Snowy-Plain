@@ -3,8 +3,12 @@ require 'polaris_snowy_plain.rb'
 
 RSpec.describe IntroPlain::PlayerActions do
   let(:player_actions) { IntroPlain::PlayerActions.new }
-  before { $snowy_plain = SnowyPlain.new }
-  before { $snowy_plain_hero = IntroPlain::Hero.new }
+
+  before do
+    $snowy_plain_plain = IntroPlain::Plain.new
+    $snowy_plain = SnowyPlain.new
+    $snowy_plain_hero = IntroPlain::Hero.new
+  end
 
   describe 'key_entered' do
     before do

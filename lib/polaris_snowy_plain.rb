@@ -7,6 +7,7 @@
 
 class Interpreter
   def snowy_plain_initialize(options = {})
+    $snowy_plain_plain = IntroPlain::Plain.new(options)
     $snowy_plain_hero = IntroPlain::Hero.new(options)
     $snowy_plain = SnowyPlain.new(options)
     $snowy_plain_player_actions = IntroPlain::PlayerActions.new
@@ -66,10 +67,19 @@ module IntroPlain
       @sight_angle %= 360
     end
   end
+
+  class Plain
+    DEFAULT_RADIUS = 100
+
+    attr_accessor :radius     # Rayon du cercle extérieur, au delà duquel le héros ne peut aller
+
+    def initialize(options = {})
+      @radius = options[:radius] || DEFAULT_RADIUS
+    end 
+  end
 end
 
 class SnowyPlain
-  DEFAULT_OUTER_CIRCLE_RADIUS = 100
   DEFAULT_INNER_CIRCLE_RADIUS = 70
   MAX_SIGHT_ANGLE = 10        # Angle où le héros peut entrer dans la base quand il est devant
   WIDE_SIGHT_ANGLE = 30       # Angle maximal où le héros peut voir la base
@@ -77,16 +87,14 @@ class SnowyPlain
   MOVE_STEP = 2               # Distance de déplacement
   BASE_PICTURE_ID = 9         # ID of the picture used for the base
   
-  attr_accessor :outer_circle_radius        # Rayon du cercle extérieur, au delà duquel le héros ne peut aller
   attr_accessor :inner_circle_radius        # Rayon du cercle intérieur, à partir duquel la base est visible
   attr_accessor :hero_position_angle        # Angle du héros par rapport au cercle trigo
   attr_accessor :hero_distance_from_base    # Distance du héros par rapport à la base 
 
   def initialize(options = {})
-    @outer_circle_radius = options[:outer_circle_radius] || DEFAULT_OUTER_CIRCLE_RADIUS
     @inner_circle_radius = options[:inner_circle_radius] || DEFAULT_INNER_CIRCLE_RADIUS
     @hero_position_angle = options[:hero_position_angle] || IntroPlain::Hero::DEFAULT_ANGLE
-    @hero_distance_from_base = options[:hero_distance_from_base] || @outer_circle_radius
+    @hero_distance_from_base = options[:hero_distance_from_base] || $snowy_plain_plain.radius
   end
   
   def information
@@ -115,7 +123,7 @@ class SnowyPlain
   end
 
   def hero_touches_outer_limit?
-    @hero_distance_from_base == @outer_circle_radius
+    @hero_distance_from_base == $snowy_plain_plain.radius
   end
 
   private
@@ -179,7 +187,7 @@ class SnowyPlain
   end
 
   def resolve_limits
-    @hero_distance_from_base = DEFAULT_OUTER_CIRCLE_RADIUS if @hero_distance_from_base > DEFAULT_OUTER_CIRCLE_RADIUS
+    @hero_distance_from_base = IntroPlain::Plain::DEFAULT_RADIUS if @hero_distance_from_base > IntroPlain::Plain::DEFAULT_RADIUS
     @hero_distance_from_base = MIN_DISTANCE_FROM_BASE if @hero_distance_from_base < MIN_DISTANCE_FROM_BASE
   end
 end

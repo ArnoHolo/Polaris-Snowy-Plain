@@ -4,7 +4,11 @@ require 'polaris_snowy_plain.rb'
 RSpec.describe IntroPlain::Hero do
   let(:hero) { IntroPlain::Hero.new options }
   let(:options) { {} }
-  before { $snowy_plain = SnowyPlain.new }
+
+  before do
+    $snowy_plain_plain = IntroPlain::Plain.new
+    $snowy_plain = SnowyPlain.new
+  end
 
   describe 'initialize' do
     context 'when no option is given' do

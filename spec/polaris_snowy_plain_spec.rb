@@ -3,24 +3,26 @@ require 'polaris_snowy_plain.rb'
 
 RSpec.describe SnowyPlain do
   let(:snowy_plain) { SnowyPlain.new options }
-  before { $snowy_plain_hero = IntroPlain::Hero.new }
   let(:options) { {} }
+
+  before do
+    $snowy_plain_plain = IntroPlain::Plain.new
+    $snowy_plain_hero = IntroPlain::Hero.new
+  end
 
   describe 'initialize_variables' do
     context 'when no option is given' do
       it 'initializes all variables with default values' do
-        expect(snowy_plain.outer_circle_radius).to eq SnowyPlain::DEFAULT_OUTER_CIRCLE_RADIUS
         expect(snowy_plain.inner_circle_radius).to eq SnowyPlain::DEFAULT_INNER_CIRCLE_RADIUS
         expect(snowy_plain.hero_position_angle).to eq IntroPlain::Hero::DEFAULT_ANGLE
-        expect(snowy_plain.hero_distance_from_base).to eq SnowyPlain::DEFAULT_OUTER_CIRCLE_RADIUS
+        expect(snowy_plain.hero_distance_from_base).to eq IntroPlain::Plain::DEFAULT_RADIUS
       end
     end
 
     context 'when options are given' do
-      let(:options) { {:outer_circle_radius => 1, :inner_circle_radius => 2, :hero_position_angle => 3, :hero_distance_from_base => 4} }
+      let(:options) { {:inner_circle_radius => 2, :hero_position_angle => 3, :hero_distance_from_base => 4} }
 
       it 'initializes all variables with these options' do
-        expect(snowy_plain.outer_circle_radius).to eq 1
         expect(snowy_plain.inner_circle_radius).to eq 2
         expect(snowy_plain.hero_position_angle).to eq 3
         expect(snowy_plain.hero_distance_from_base).to eq 4
@@ -145,7 +147,7 @@ RSpec.describe SnowyPlain do
       end
 
       context 'on outer limit' do
-        let(:hero_distance_from_base) { SnowyPlain::DEFAULT_OUTER_CIRCLE_RADIUS }
+        let(:hero_distance_from_base) { IntroPlain::Plain::DEFAULT_RADIUS }
 
         before { subject }
 
