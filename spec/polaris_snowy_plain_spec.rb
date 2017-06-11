@@ -63,36 +63,48 @@ RSpec.describe SnowyPlain do
   # Private
 
   describe 'base_x_position' do
-    context 'when hero looks a bit on the left' do
-      before { $snowy_plain_hero.sight_angle = 360 - SnowyPlain::WIDE_SIGHT_ANGLE / 2 }
+    subject { snowy_plain.send(:base_x_position) }
 
-      subject { snowy_plain.send(:base_x_position) }
+    [SnowyPlain::MIN_DISTANCE_FROM_BASE, IntroPlain::Plain::DEFAULT_RADIUS].each do |distance|
+      context "when distance from base is #{distance}" do
+        before { snowy_plain.hero_distance_from_base = distance }
 
-      it { should be > 320 }
-    end
+        context 'when hero looks a bit on the left' do
+          before { $snowy_plain_hero.sight_angle = 360 - SnowyPlain::WIDE_SIGHT_ANGLE / 2 }
 
-    context 'when hero looks at the left limit' do
-      before { $snowy_plain_hero.sight_angle = 360 - SnowyPlain::WIDE_SIGHT_ANGLE + 1 }
+          it do
+            should be > 1.5 * SnowyPlain::SCREEN_HALF_WIDTH
+            should be < 2 * SnowyPlain::SCREEN_HALF_WIDTH
+          end
+        end
 
-      subject { snowy_plain.send(:base_x_position) }
+        context 'when hero looks at the left limit' do
+          before { $snowy_plain_hero.sight_angle = 360 - SnowyPlain::WIDE_SIGHT_ANGLE + 1 }
 
-      it { should be > 480 }
-    end
+          it do
+            should be > 1.5 * SnowyPlain::SCREEN_HALF_WIDTH
+            should be < 2 * SnowyPlain::SCREEN_HALF_WIDTH
+          end
+        end
 
-    context 'when hero looks a bit on the right' do
-      before { $snowy_plain_hero.sight_angle = SnowyPlain::WIDE_SIGHT_ANGLE / 2 }
+        context 'when hero looks a bit on the right' do
+          before { $snowy_plain_hero.sight_angle = SnowyPlain::WIDE_SIGHT_ANGLE / 2 }
 
-      subject { snowy_plain.send(:base_x_position) }
+          it do
+            should be > 0
+            should be < 0.5 * SnowyPlain::SCREEN_HALF_WIDTH
+          end
+        end
 
-      it { should be < 320 }
-    end
+        context 'when hero looks at the right limit' do
+          before { $snowy_plain_hero.sight_angle = SnowyPlain::WIDE_SIGHT_ANGLE - 1 }
 
-    context 'when hero looks at the right limit' do
-      before { $snowy_plain_hero.sight_angle = SnowyPlain::WIDE_SIGHT_ANGLE - 1 }
-
-      subject { snowy_plain.send(:base_x_position) }
-
-      it { should be < 160 }
+          it do
+            should be > 0
+            should be < 0.5 * SnowyPlain::SCREEN_HALF_WIDTH
+          end
+        end
+      end
     end
   end
 
