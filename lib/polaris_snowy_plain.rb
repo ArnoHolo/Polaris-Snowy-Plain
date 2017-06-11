@@ -80,7 +80,13 @@ class SnowyPlain
   MIN_DISTANCE_FROM_BASE = 5  # Distance minimale entre le héros et la base
   MOVE_STEP = 2               # Distance de déplacement
   BASE_PICTURE_ID = 9         # ID of the picture used for the base
-  
+
+  # RMXP default values
+  SCREEN_HALF_WIDTH = 320
+  SCREEN_HALF_HEIGHT = 240
+  MAX_ZOOM = 100
+  MAX_OPACITY = 255
+
   attr_accessor :inner_circle_radius        # Rayon du cercle intérieur, à partir duquel la base est visible
   attr_accessor :hero_position_angle        # Angle du héros par rapport au cercle trigo
   attr_accessor :hero_distance_from_base    # Distance du héros par rapport à la base 
@@ -100,7 +106,7 @@ class SnowyPlain
   end
 
   def display_base
-    opacity = base_is_behind_hero? ? 0 : 255
+    opacity = base_is_behind_hero? ? 0 : MAX_OPACITY
     zoom = base_zoom
     move_base(:image_x => base_x_position, :image_y => base_y_position(zoom), :zoom => zoom, :opacity => opacity)
   end
@@ -125,8 +131,8 @@ class SnowyPlain
   end
 
   def base_zoom
-    distance_of_base_percentage = (@hero_distance_from_base.to_f - MIN_DISTANCE_FROM_BASE) * 100 / (DEFAULT_INNER_CIRCLE_RADIUS - MIN_DISTANCE_FROM_BASE)
-    zoom = 100 - distance_of_base_percentage
+    distance_of_base_percentage = (@hero_distance_from_base.to_f - MIN_DISTANCE_FROM_BASE) * MAX_ZOOM / (DEFAULT_INNER_CIRCLE_RADIUS - MIN_DISTANCE_FROM_BASE)
+    zoom = MAX_ZOOM - distance_of_base_percentage
     zoom = 1 if zoom < 1
     zoom
   end
@@ -134,18 +140,18 @@ class SnowyPlain
   def base_x_position
     base_position_cosinus = Math.cos(-convert_to_radians($snowy_plain_hero.sight_angle + 90))
     max_width_cosinus = Math.cos(convert_to_radians(90 - WIDE_SIGHT_ANGLE))
-    base_position_scaled = base_position_cosinus * 320 / max_width_cosinus
-    base_position_scaled + 320
+    base_position_scaled = base_position_cosinus * SCREEN_HALF_WIDTH / max_width_cosinus
+    base_position_scaled + SCREEN_HALF_WIDTH
   end
 
   def base_y_position(zoom)
-    base_ymax = 240
-    base_ymin = 300
-    base_ymax * zoom / 100.0 + base_ymin * (100 - zoom) / 100.0
+    base_ymin = SCREEN_HALF_HEIGHT
+    base_ymax = SCREEN_HALF_HEIGHT + 60
+    base_ymin * zoom / 100.0 + base_ymax * (MAX_ZOOM - zoom) / 100.0
   end
   
   def move_base(options = {})
-    duration = 1; origin = 1; image_x = 320; image_y = 240; zoom_x = 100; zoom_y = 100; opacity = 255; blend_type = 0;
+    duration = 1; origin = 1; image_x = SCREEN_HALF_WIDTH; image_y = SCREEN_HALF_HEIGHT; zoom_x = MAX_ZOOM; zoom_y = MAX_ZOOM; opacity = MAX_OPACITY; blend_type = 0;
 
     image_x = options[:image_x] if options[:image_x]
     image_y = options[:image_y] if options[:image_y]
