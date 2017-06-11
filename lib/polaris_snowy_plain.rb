@@ -25,18 +25,12 @@ end
 module IntroPlain
   class PlayerActions
     def key_entered
-      case Input.dir4
-        when Input::UP
-          $snowy_plain_hero.move_forward
-        when Input::DOWN
-          $snowy_plain_hero.move_backwards
-        when Input::LEFT
-          $snowy_plain_hero.turn_left
-        when Input::RIGHT
-          $snowy_plain_hero.turn_right
-      end
-      $snowy_plain.display_base
+      $snowy_plain_hero.move_forward if Input.press? Input::UP
+      $snowy_plain_hero.move_backwards if Input.press? Input::DOWN
+      $snowy_plain_hero.turn_left if Input.press? Input::LEFT
+      $snowy_plain_hero.turn_right if Input.press? Input::RIGHT
       $snowy_plain.information if Input.press? Input::A
+      $snowy_plain.display_base
     end
   end
 

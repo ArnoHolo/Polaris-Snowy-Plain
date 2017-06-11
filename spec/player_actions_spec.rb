@@ -22,11 +22,19 @@ RSpec.describe IntroPlain::PlayerActions do
 
     before { expect($snowy_plain).to receive(:display_base) }
 
+    before { expect(Input).to receive(:press?).with(:input_up).and_return(pressed_input_up) }
+    before { expect(Input).to receive(:press?).with(:input_down).and_return(pressed_input_down) }
+    before { expect(Input).to receive(:press?).with(:input_left).and_return(pressed_input_left) }
+    before { expect(Input).to receive(:press?).with(:input_right).and_return(pressed_input_right) }
     before { expect(Input).to receive(:press?).with(:input_a).and_return(pressed_input_a) }
+    let(:pressed_input_up) { false }
+    let(:pressed_input_down) { false }
+    let(:pressed_input_left) { false }
+    let(:pressed_input_right) { false }
     let(:pressed_input_a) { false }
 
     context 'when player enters UP key' do
-      before { expect(Input).to receive(:dir4).and_return(:input_up) }
+      let(:pressed_input_up) { true }
 
       before { expect($snowy_plain_hero).to receive(:move_forward) }
       before { expect($snowy_plain).not_to receive(:information) }
@@ -35,7 +43,7 @@ RSpec.describe IntroPlain::PlayerActions do
     end
 
     context 'when player enters DOWN key' do
-      before { expect(Input).to receive(:dir4).and_return(:input_down) }
+      let(:pressed_input_down) { true }
 
       before { expect($snowy_plain_hero).to receive(:move_backwards) }
       before { expect($snowy_plain).not_to receive(:information) }
@@ -44,7 +52,7 @@ RSpec.describe IntroPlain::PlayerActions do
     end
 
     context 'when player enters LEFT key' do
-      before { expect(Input).to receive(:dir4).and_return(:input_left) }
+      let(:pressed_input_left) { true }
 
       before { expect($snowy_plain_hero).to receive(:turn_left) }
       before { expect($snowy_plain).not_to receive(:information) }
@@ -53,7 +61,7 @@ RSpec.describe IntroPlain::PlayerActions do
     end
 
     context 'when player enters RIGHT key' do
-      before { expect(Input).to receive(:dir4).and_return(:input_right) }
+      let(:pressed_input_right) { true }
 
       before { expect($snowy_plain_hero).to receive(:turn_right) }
       before { expect($snowy_plain).not_to receive(:information) }
@@ -63,8 +71,6 @@ RSpec.describe IntroPlain::PlayerActions do
 
     context 'when player enters A key' do
       let(:pressed_input_a) { true }
-
-      before { expect(Input).to receive(:dir4) }
 
       before { expect($snowy_plain).to receive(:information) }
 
