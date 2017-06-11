@@ -98,7 +98,7 @@ class SnowyPlain
   end
   
   def information
-    print "#{$snowy_plain_hero.sight_angle} - #{@hero_distance_from_base}"
+    print "Angle = #{$snowy_plain_hero.sight_angle} - Distance = #{@hero_distance_from_base}"
   end
 
   def base_found?
