@@ -106,11 +106,8 @@ class SnowyPlain
   end
 
   def display_base
-    if hero_can_see_base?
-      move_base(:image_x => base_x_position, :zoom => base_zoom)
-    else
-      hide_base
-    end
+    opacity = base_is_behind_hero? ? 0 : 255
+    move_base(:image_x => base_x_position, :zoom => base_zoom, :opacity => opacity)
   end
 
   def hero_touches_base?
@@ -128,8 +125,8 @@ class SnowyPlain
 
   private
 
-  def hero_can_see_base?
-    $snowy_plain_hero.sight_angle <= WIDE_SIGHT_ANGLE || $snowy_plain_hero.sight_angle >= 360 - WIDE_SIGHT_ANGLE
+  def base_is_behind_hero?
+    $snowy_plain_hero.sight_angle > 90 && $snowy_plain_hero.sight_angle < 270
   end
 
   def base_zoom
@@ -154,10 +151,6 @@ class SnowyPlain
     opacity = options[:opacity] if options[:opacity]
 
     $game_screen.pictures[BASE_PICTURE_ID].move(duration, origin, image_x, image_y, zoom_x, zoom_y, opacity, blend_type)
-  end
-  
-  def hide_base
-    move_base(:opacity => 0)
   end
 
   def hero_looks_at_base?
