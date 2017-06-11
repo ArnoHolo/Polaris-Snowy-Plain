@@ -54,7 +54,7 @@ module IntroPlain
     end
   
     def move_backwards
-      $snowy_plain.move_to_direction(-@sight_angle) unless $snowy_plain.hero_touches_outer_limit?
+      $snowy_plain.move_to_direction(@sight_angle + 180) unless $snowy_plain.hero_touches_outer_limit?
     end
   
     def turn_left

@@ -53,7 +53,7 @@ RSpec.describe IntroPlain::Hero do
       before { expect($snowy_plain).to receive(:hero_touches_outer_limit?).and_return(false) }
 
       context 'when hero sight angle is equal zero' do
-        before { expect($snowy_plain).to receive(:move_to_direction).with(-hero.sight_angle) }
+        before { expect($snowy_plain).to receive(:move_to_direction).with(hero.sight_angle + 180) }
 
         it { hero.move_backwards }
       end
